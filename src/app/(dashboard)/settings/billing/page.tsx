@@ -36,7 +36,7 @@ const features = {
 };
 
 export default function BillingPage() {
-  const { plan, isProUser, loading: planLoading } = useSubscription();
+  const { isProUser } = useSubscription();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
 

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { applicationSchema } from "@/lib/validators";
-import { Prisma } from "@prisma/client";
+import { Prisma, ApplicationStatus } from "@prisma/client";
 
 export async function GET(req: Request) {
   try {
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
 
     if (status) {
       const statuses = status.split(",");
-      where.status = { in: statuses as any[] };
+      where.status = { in: statuses as ApplicationStatus[] };
     }
 
     if (search) {

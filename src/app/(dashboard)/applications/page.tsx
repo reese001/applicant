@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ApplicationList } from "@/components/dashboard/application-list";
@@ -19,7 +19,6 @@ import type { Application, Tag } from "@prisma/client";
 type ApplicationWithTags = Application & { tags: Tag[] };
 
 export default function ApplicationsPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [applications, setApplications] = useState<ApplicationWithTags[]>([]);

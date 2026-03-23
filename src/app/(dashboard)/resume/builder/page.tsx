@@ -247,7 +247,7 @@ function ResumeBuilderContent() {
                   const result = await refineWithAI("skills", `Current skills: ${resume.skills.join(", ")}. Context: ${context}`);
                   if (result) {
                     const newSkills = result.split(",").map((s: string) => s.trim()).filter(Boolean);
-                    setResume((p) => ({ ...p, skills: [...new Set([...p.skills, ...newSkills])] }));
+                    setResume((p) => ({ ...p, skills: Array.from(new Set([...p.skills, ...newSkills])) }));
                     toast.success("Skills suggested!");
                   }
                 }}>

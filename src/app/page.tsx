@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Briefcase, BarChart3, FileText, Sparkles, Target, MessageSquare,
-  Check, ArrowRight, Zap, Shield, Globe,
+  Check, ArrowRight, Zap,
 } from "lucide-react";
 
 const features = [

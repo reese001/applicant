@@ -35,7 +35,14 @@ export async function POST(req: Request) {
 
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription as string
-        );
+        ) as Stripe.Subscription & { current_period_start?: number; current_period_end?: number };
+
+        const periodStart = subscription.current_period_start
+          ? new Date(subscription.current_period_start * 1000)
+          : new Date();
+        const periodEnd = subscription.current_period_end
+          ? new Date(subscription.current_period_end * 1000)
+          : new Date();
 
         await prisma.subscription.upsert({
           where: { userId },
@@ -45,16 +52,16 @@ export async function POST(req: Request) {
             stripeSubscriptionId: subscription.id,
             stripePriceId: subscription.items.data[0].price.id,
             status: "ACTIVE",
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            currentPeriodStart: periodStart,
+            currentPeriodEnd: periodEnd,
           },
           update: {
             stripeCustomerId: session.customer as string,
             stripeSubscriptionId: subscription.id,
             stripePriceId: subscription.items.data[0].price.id,
             status: "ACTIVE",
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            currentPeriodStart: periodStart,
+            currentPeriodEnd: periodEnd,
           },
         });
 
@@ -66,16 +73,18 @@ export async function POST(req: Request) {
       }
 
       case "invoice.payment_succeeded": {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as Stripe.Invoice & { subscription?: string | null };
         const subscriptionId = invoice.subscription as string;
 
         if (subscriptionId) {
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription & { current_period_end?: number };
           await prisma.subscription.updateMany({
             where: { stripeSubscriptionId: subscriptionId },
             data: {
               status: "ACTIVE",
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodEnd: subscription.current_period_end
+                ? new Date(subscription.current_period_end * 1000)
+                : new Date(),
             },
           });
         }
@@ -83,7 +92,7 @@ export async function POST(req: Request) {
       }
 
       case "invoice.payment_failed": {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as Stripe.Invoice & { subscription?: string | null };
         const subscriptionId = invoice.subscription as string;
 
         if (subscriptionId) {
@@ -96,7 +105,7 @@ export async function POST(req: Request) {
       }
 
       case "customer.subscription.updated": {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as Stripe.Subscription & { current_period_end?: number; cancel_at_period_end?: boolean };
         await prisma.subscription.updateMany({
           where: { stripeSubscriptionId: subscription.id },
           data: {
@@ -104,8 +113,10 @@ export async function POST(req: Request) {
                     subscription.status === "canceled" ? "CANCELED" :
                     subscription.status === "past_due" ? "PAST_DUE" :
                     subscription.status === "trialing" ? "TRIALING" : "ACTIVE",
-            cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
+            currentPeriodEnd: subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000)
+              : new Date(),
           },
         });
         break;

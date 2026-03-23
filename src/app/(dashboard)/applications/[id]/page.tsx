@@ -8,8 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { StatusBadge } from "@/components/application/status-badge";
+
 import { DetailSkeleton } from "@/components/shared/loading-skeleton";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -53,11 +52,9 @@ export default function ApplicationDetailPage() {
 
   // Contact form
   const [showContactForm, setShowContactForm] = useState(false);
-  const [contactData, setContactData] = useState({ name: "", role: "", email: "", phone: "", notes: "" });
 
   // Reminder form
   const [showReminderForm, setShowReminderForm] = useState(false);
-  const [reminderData, setReminderData] = useState({ remindAt: "", message: "" });
 
   useEffect(() => {
     async function fetchApplication() {

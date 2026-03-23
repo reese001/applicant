@@ -47,7 +47,8 @@ export function ApplicationList({
                     onClick={() => onSort(header.key)}
                   >
                     {header.label}
-                    <ArrowUpDown className="ml-1 h-3 w-3" />
+                    <ArrowUpDown className={`ml-1 h-3 w-3 ${sortField === header.key ? "text-foreground" : ""}`} />
+                    {sortField === header.key && <span className="sr-only">{sortOrder === "asc" ? "ascending" : "descending"}</span>}
                   </Button>
                 </th>
               ))}

@@ -59,12 +59,12 @@ export const resumeBuildSchema = z.object({
 });
 
 export const resumeTailorSchema = z.object({
-  resumeJson: z.record(z.unknown()),
+  resumeJson: z.record(z.string(), z.unknown()),
   jobDescription: z.string().min(1),
 });
 
 export const coverLetterSchema = z.object({
-  resumeJson: z.record(z.unknown()),
+  resumeJson: z.record(z.string(), z.unknown()),
   jobDescription: z.string().min(1),
   companyName: z.string().min(1),
 });
@@ -75,7 +75,7 @@ export const interviewPrepSchema = z.object({
 });
 
 export const atsCheckSchema = z.object({
-  resumeJson: z.record(z.unknown()),
+  resumeJson: z.record(z.string(), z.unknown()),
   jobDescription: z.string().min(1),
 });
 
