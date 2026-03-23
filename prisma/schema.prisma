@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+}
+
+enum ApplicationStatus {
+  SAVED
+  APPLIED
+  PHONE_SCREEN
+  INTERVIEW
+  OFFER
+  REJECTED
+  WITHDRAWN
+}
+
+model User {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  name            String?
+  passwordHash    String?
+  emailVerified   DateTime?
+  image           String?
+  plan            Plan           @default(FREE)
+  scrapeCount     Int            @default(0)
+  scrapeResetDate DateTime       @default(now())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  accounts        Account[]
+  sessions        Session[]
+  applications    Application[]
+  resumes         Resume[]
+  subscription    Subscription?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  status               SubscriptionStatus @default(TRIALING)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Application {
+  id             String            @id @default(cuid())
+  userId         String
+  jobTitle       String
+  company        String
+  location       String?
+  url            String?
+  salaryMin      Int?
+  salaryMax      Int?
+  salaryCurrency String?           @default("USD")
+  description    String?           @db.Text
+  status         ApplicationStatus @default(APPLIED)
+  appliedDate    DateTime          @default(now())
+  notes          String?           @db.Text
+  position       Int               @default(0)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags           Tag[]
+  contacts       Contact[]
+  reminders      Reminder[]
+  activityLogs   ActivityLog[]
+  linkedResume   Resume?           @relation(fields: [linkedResumeId], references: [id])
+  linkedResumeId String?
+
+  @@index([userId, status])
+  @@index([userId, appliedDate])
+}
+
+model Tag {
+  id           String        @id @default(cuid())
+  name         String
+  color        String        @default("#6366f1")
+  applications Application[]
+
+  @@unique([name])
+}
+
+model Contact {
+  id            String      @id @default(cuid())
+  applicationId String
+  name          String
+  role          String?
+  email         String?
+  phone         String?
+  notes         String?
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model Reminder {
+  id            String      @id @default(cuid())
+  applicationId String
+  remindAt      DateTime
+  message       String?
+  sent          Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([remindAt, sent])
+}
+
+model ActivityLog {
+  id            String      @id @default(cuid())
+  applicationId String
+  action        String
+  oldValue      String?
+  newValue      String?
+  createdAt     DateTime    @default(now())
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, createdAt])
+}
+
+model Resume {
+  id           String        @id @default(cuid())
+  userId       String
+  title        String
+  contentJson  Json
+  templateId   String?
+  pdfUrl       String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications Application[]
+
+  @@index([userId])
+}
