@@ -14,13 +14,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <SessionProvider>
-      <div className="min-h-screen bg-background">
+      <div className="dark min-h-screen bg-[#08080c] text-white relative">
+        <div className="absolute inset-0 dot-grid opacity-[0.03] pointer-events-none" />
         <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
         <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
-        <div className={cn("transition-all duration-300", sidebarCollapsed ? "md:ml-16" : "md:ml-64")}>
+        <div className={cn("relative z-10 transition-all duration-300", sidebarCollapsed ? "md:ml-16" : "md:ml-60")}>
           <TopNav onMenuClick={() => setMobileNavOpen(true)} />
           <UpgradeBanner />
-          <main className="p-4 md:p-6">{children}</main>
+          <main className="p-4 md:p-6 lg:p-8">{children}</main>
         </div>
       </div>
     </SessionProvider>

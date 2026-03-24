@@ -2,7 +2,6 @@
 
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { KanbanCard } from "./kanban-card";
 import { cn } from "@/lib/utils";
 import type { Application, Tag } from "@prisma/client";
@@ -17,12 +16,12 @@ interface KanbanColumnProps {
 }
 
 const columnColors: Record<string, string> = {
-  SAVED: "border-t-gray-400",
-  APPLIED: "border-t-blue-500",
-  PHONE_SCREEN: "border-t-purple-500",
-  INTERVIEW: "border-t-amber-500",
-  OFFER: "border-t-green-500",
-  REJECTED: "border-t-red-500",
+  SAVED: "border-t-gray-500/60",
+  APPLIED: "border-t-blue-500/60",
+  PHONE_SCREEN: "border-t-purple-500/60",
+  INTERVIEW: "border-t-amber-500/60",
+  OFFER: "border-t-emerald-500/60",
+  REJECTED: "border-t-red-500/60",
 };
 
 export function KanbanColumn({ id, title, applications }: KanbanColumnProps) {
@@ -31,19 +30,19 @@ export function KanbanColumn({ id, title, applications }: KanbanColumnProps) {
   return (
     <div
       className={cn(
-        "flex flex-col min-w-[280px] max-w-[280px] rounded-lg border border-t-4 bg-muted/30",
-        columnColors[id] || "border-t-gray-400",
-        isOver && "ring-2 ring-primary/50"
+        "flex flex-col min-w-[280px] max-w-[280px] rounded-2xl border-t-[3px] bg-white/[0.02] border border-white/[0.04]",
+        columnColors[id] || "border-t-gray-500/60",
+        isOver && "ring-1 ring-white/10 bg-white/[0.04]"
       )}
     >
-      <div className="flex items-center justify-between p-3 pb-2">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+      <div className="flex items-center justify-between px-4 py-3">
+        <h3 className="text-sm font-semibold tracking-tight text-white/70">{title}</h3>
+        <span className="flex items-center justify-center h-5 min-w-[20px] rounded-md bg-white/[0.06] px-1.5 text-[11px] font-medium text-white/40">
           {applications.length}
         </span>
       </div>
 
-      <ScrollArea className="flex-1 px-3 pb-3">
+      <div className="flex-1 overflow-y-auto px-3 pb-3">
         <div ref={setNodeRef} className="space-y-2 min-h-[100px]">
           <SortableContext
             items={applications.map((a) => a.id)}
@@ -54,7 +53,7 @@ export function KanbanColumn({ id, title, applications }: KanbanColumnProps) {
             ))}
           </SortableContext>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

@@ -57,7 +57,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "Times New Roman", "serif"],
       },
       keyframes: {
         "accordion-down": {

@@ -1,17 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Link as LinkIcon, Sparkles } from "lucide-react";
 
@@ -29,6 +22,9 @@ const statuses = [
   { value: "OFFER", label: "Offer" },
   { value: "REJECTED", label: "Rejected" },
 ];
+
+const inputClass = "w-full rounded-xl bg-white/[0.03] border border-white/[0.08] px-4 py-2.5 text-sm text-white/80 placeholder:text-white/25 focus:outline-none focus:ring-1 focus:ring-white/15 transition-colors";
+const labelClass = "text-xs font-medium text-white/50";
 
 export function AddApplicationModal({ open, onClose, onSuccess }: AddApplicationModalProps) {
   const [loading, setLoading] = useState(false);
@@ -133,161 +129,177 @@ export function AddApplicationModal({ open, onClose, onSuccess }: AddApplication
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0c0c12]/95 backdrop-blur-xl border-white/[0.08]">
         <DialogHeader>
-          <DialogTitle>Add Application</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-white/90">Add Application</DialogTitle>
+          <DialogDescription className="text-white/40">
             Add a new job application to track. Paste a URL to auto-fill details.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex gap-2 mb-4">
           <div className="flex-1 relative">
-            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
+            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+            <input
               placeholder="Paste job URL to auto-fill..."
               value={scrapeUrl}
               onChange={(e) => setScrapeUrl(e.target.value)}
-              className="pl-9"
+              className={`${inputClass} pl-9`}
             />
           </div>
-          <Button
+          <button
             type="button"
-            variant="secondary"
             onClick={handleScrape}
             disabled={scraping || !scrapeUrl}
+            className="liquid-glass rounded-xl px-4 py-2.5 text-sm font-medium text-white/60 hover:text-white/80 transition-colors inline-flex items-center gap-2 disabled:opacity-40 disabled:pointer-events-none"
           >
             {scraping ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            <span className="ml-2">Scrape</span>
-          </Button>
+            Scrape
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="jobTitle">Job Title *</Label>
-              <Input
+              <label htmlFor="jobTitle" className={labelClass}>Job Title *</label>
+              <input
                 id="jobTitle"
                 value={formData.jobTitle}
                 onChange={(e) => updateField("jobTitle", e.target.value)}
                 required
+                className={inputClass}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company">Company *</Label>
-              <Input
+              <label htmlFor="company" className={labelClass}>Company *</label>
+              <input
                 id="company"
                 value={formData.company}
                 onChange={(e) => updateField("company", e.target.value)}
                 required
+                className={inputClass}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
-              <Input
+              <label htmlFor="location" className={labelClass}>Location</label>
+              <input
                 id="location"
                 placeholder="e.g., San Francisco, CA or Remote"
                 value={formData.location}
                 onChange={(e) => updateField("location", e.target.value)}
+                className={inputClass}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(v) => updateField("status", v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {statuses.map((s) => (
-                    <SelectItem key={s.value} value={s.value}>
-                      {s.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label htmlFor="status" className={labelClass}>Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) => updateField("status", e.target.value)}
+                className={`${inputClass} appearance-none cursor-pointer`}
+              >
+                {statuses.map((s) => (
+                  <option key={s.value} value={s.value} className="bg-[#0c0c12] text-white/80">
+                    {s.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="salaryMin">Salary Min</Label>
-              <Input
+              <label htmlFor="salaryMin" className={labelClass}>Salary Min</label>
+              <input
                 id="salaryMin"
                 type="number"
                 placeholder="80000"
                 value={formData.salaryMin}
                 onChange={(e) => updateField("salaryMin", e.target.value)}
+                className={inputClass}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="salaryMax">Salary Max</Label>
-              <Input
+              <label htmlFor="salaryMax" className={labelClass}>Salary Max</label>
+              <input
                 id="salaryMax"
                 type="number"
                 placeholder="120000"
                 value={formData.salaryMax}
                 onChange={(e) => updateField("salaryMax", e.target.value)}
+                className={inputClass}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="url">URL</Label>
-              <Input
+              <label htmlFor="url" className={labelClass}>URL</label>
+              <input
                 id="url"
                 type="url"
                 placeholder="https://..."
                 value={formData.url}
                 onChange={(e) => updateField("url", e.target.value)}
+                className={inputClass}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Job Description</Label>
-            <Textarea
+            <label htmlFor="description" className={labelClass}>Job Description</label>
+            <textarea
               id="description"
               placeholder="Paste the job description here..."
               value={formData.description}
               onChange={(e) => updateField("description", e.target.value)}
               rows={4}
+              className={`${inputClass} resize-none`}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags</Label>
-            <Input
+            <label htmlFor="tags" className={labelClass}>Tags</label>
+            <input
               id="tags"
               placeholder="e.g., remote, frontend, startup (comma separated)"
               value={formData.tags}
               onChange={(e) => updateField("tags", e.target.value)}
+              className={inputClass}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
+            <label htmlFor="notes" className={labelClass}>Notes</label>
+            <textarea
               id="notes"
               placeholder="Any notes about this application..."
               value={formData.notes}
               onChange={(e) => updateField("notes", e.target.value)}
               rows={3}
+              className={`${inputClass} resize-none`}
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="liquid-glass rounded-xl px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white/80 transition-colors"
+            >
               Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="liquid-glass-strong rounded-xl px-5 py-2.5 text-sm font-medium text-white/80 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:pointer-events-none inline-flex items-center gap-2"
+            >
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               Add Application
-            </Button>
+            </button>
           </DialogFooter>
         </form>
       </DialogContent>

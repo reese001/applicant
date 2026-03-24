@@ -14,7 +14,7 @@ function getAnthropicClient() {
 
 export const anthropic = new Proxy({} as Anthropic, {
   get(_, prop) {
-    return (getAnthropicClient() as Record<string | symbol, unknown>)[prop];
+    return (getAnthropicClient() as unknown as Record<string | symbol, unknown>)[prop];
   },
 });
 

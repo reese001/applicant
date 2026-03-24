@@ -1,14 +1,13 @@
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  SAVED: { label: "Saved", className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700" },
-  APPLIED: { label: "Applied", className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-800" },
-  PHONE_SCREEN: { label: "Phone Screen", className: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 border-purple-200 dark:border-purple-800" },
-  INTERVIEW: { label: "Interview", className: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 border-amber-200 dark:border-amber-800" },
-  OFFER: { label: "Offer", className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-200 dark:border-green-800" },
-  REJECTED: { label: "Rejected", className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border-red-200 dark:border-red-800" },
-  WITHDRAWN: { label: "Withdrawn", className: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 border-orange-200 dark:border-orange-800" },
+  SAVED: { label: "Saved", className: "bg-gray-500/10 text-gray-400 border-gray-500/20" },
+  APPLIED: { label: "Applied", className: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+  PHONE_SCREEN: { label: "Phone Screen", className: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+  INTERVIEW: { label: "Interview", className: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
+  OFFER: { label: "Offer", className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+  REJECTED: { label: "Rejected", className: "bg-red-500/10 text-red-400 border-red-500/20" },
+  WITHDRAWN: { label: "Withdrawn", className: "bg-orange-500/10 text-orange-400 border-orange-500/20" },
 };
 
 interface StatusBadgeProps {
@@ -17,11 +16,15 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = statusConfig[status] || { label: status, className: "" };
+  const config = statusConfig[status] || { label: status, className: "bg-white/[0.06] text-white/50 border-white/[0.08]" };
 
   return (
-    <Badge variant="outline" className={cn(config.className, className)}>
+    <span className={cn(
+      "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
+      config.className,
+      className
+    )}>
       {config.label}
-    </Badge>
+    </span>
   );
 }

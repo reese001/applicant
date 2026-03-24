@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(printf 'N\\\\nN\\\\n')",
-      "Bash(npx create-next-app@14 . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm)"
+      "Bash(npx create-next-app@14 . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm)",
+      "Bash(mkdir -p /Users/reese/Desktop/applicant/src/app/api/applications/[id]/contacts/[contactId])",
+      "Bash(mkdir -p /Users/reese/Desktop/applicant/src/app/api/applications/[id]/reminders/[reminderId])",
+      "Bash(mkdir -p /Users/reese/Desktop/applicant/src/app/api/resumes/[id])",
+      "Bash(npm run:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }

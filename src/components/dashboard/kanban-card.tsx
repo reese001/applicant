@@ -2,7 +2,6 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar } from "lucide-react";
 import { formatDate, truncate } from "@/lib/utils";
@@ -34,50 +33,49 @@ export function KanbanCard({ application }: KanbanCardProps) {
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Link href={`/dashboard/applications/${application.id}`}>
-        <Card className="cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow">
-          <CardContent className="p-3 space-y-2">
-            <div>
-              <h4 className="font-medium text-sm leading-tight">
-                {truncate(application.jobTitle, 40)}
-              </h4>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {application.company}
-              </p>
-            </div>
+        <div className="cursor-grab active:cursor-grabbing liquid-glass rounded-xl p-3.5 space-y-2.5 hover:bg-white/[0.04] transition-colors">
+          <div>
+            <h4 className="font-medium text-sm leading-snug text-white/85">
+              {truncate(application.jobTitle, 40)}
+            </h4>
+            <p className="text-xs text-white/40 mt-0.5">
+              {application.company}
+            </p>
+          </div>
 
+          <div className="flex items-center gap-3 text-[11px] text-white/30">
             {application.location && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
-                <span>{truncate(application.location, 25)}</span>
-              </div>
+                {truncate(application.location, 20)}
+              </span>
             )}
-
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              <span>{formatDate(application.appliedDate)}</span>
-            </div>
+              {formatDate(application.appliedDate)}
+            </span>
+          </div>
 
-            {application.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {application.tags.slice(0, 3).map((tag) => (
-                  <Badge
-                    key={tag.id}
-                    variant="secondary"
-                    className="text-[10px] px-1.5 py-0"
-                    style={{ borderColor: tag.color, color: tag.color }}
-                  >
-                    {tag.name}
-                  </Badge>
-                ))}
-                {application.tags.length > 3 && (
-                  <span className="text-[10px] text-muted-foreground">
-                    +{application.tags.length - 3}
-                  </span>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          {application.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {application.tags.slice(0, 3).map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant="secondary"
+                  className="text-[10px] px-1.5 py-0 font-normal bg-white/[0.04] border-white/[0.08] text-white/50"
+                  style={{ borderColor: tag.color, color: tag.color }}
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+              {application.tags.length > 3 && (
+                <span className="text-[10px] text-white/30">
+                  +{application.tags.length - 3}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </Link>
     </div>
   );

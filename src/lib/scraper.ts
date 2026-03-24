@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { generateAIResponse } from "@/lib/anthropic";
 
 interface ScrapedJob {
   jobTitle?: string;
@@ -11,7 +12,59 @@ interface ScrapedJob {
   url?: string;
 }
 
-export async function scrapeJobUrl(url: string): Promise<ScrapedJob> {
+function isInsufficient(job: ScrapedJob): boolean {
+  const fieldCount = [job.jobTitle, job.company, job.location, job.description].filter(Boolean).length;
+  const descTooShort = !job.description || job.description.length < 100;
+  return fieldCount < 2 || descTooShort;
+}
+
+function extractPageText($: cheerio.CheerioAPI): string {
+  // Remove scripts, styles, and nav elements
+  $("script, style, nav, header, footer, iframe, noscript").remove();
+  const text = $("body").text().replace(/\s+/g, " ").trim();
+  // Limit to ~12k chars to stay within token limits
+  return text.slice(0, 12000);
+}
+
+async function aiExtract(pageText: string, partialData: ScrapedJob): Promise<ScrapedJob> {
+  const systemPrompt = `You are a job posting data extractor. Extract structured job information from raw page text. Return ONLY valid JSON with no markdown formatting, no code fences, and no explanation.`;
+
+  const userPrompt = `Extract job posting details from this page text. Return a JSON object with these fields:
+- jobTitle (string)
+- company (string)
+- location (string)
+- description (string - the full job description including responsibilities, requirements, qualifications)
+- salaryMin (number or null - annual salary minimum)
+- salaryMax (number or null - annual salary maximum)
+- salaryCurrency (string or null - e.g. "USD", "CAD")
+
+Here is what we already extracted (may be partial/inaccurate):
+${JSON.stringify(partialData, null, 2)}
+
+Raw page text:
+${pageText}`;
+
+  try {
+    const text = await generateAIResponse(systemPrompt, userPrompt, 4096);
+    // Strip markdown code fences if present
+    const cleaned = text.replace(/```(?:json)?\n?/g, "").trim();
+    const parsed = JSON.parse(cleaned);
+    return {
+      jobTitle: parsed.jobTitle || undefined,
+      company: parsed.company || undefined,
+      location: parsed.location || undefined,
+      description: parsed.description || undefined,
+      salaryMin: parsed.salaryMin ?? undefined,
+      salaryMax: parsed.salaryMax ?? undefined,
+      salaryCurrency: parsed.salaryCurrency || undefined,
+    };
+  } catch {
+    // If AI extraction fails, return what we have
+    return partialData;
+  }
+}
+
+export async function scrapeJobUrl(url: string, useAiFallback = true): Promise<ScrapedJob> {
   const response = await fetch(url, {
     headers: {
       "User-Agent":
@@ -27,14 +80,29 @@ export async function scrapeJobUrl(url: string): Promise<ScrapedJob> {
   const $ = cheerio.load(html);
 
   const jsonLd = extractJsonLd($);
-  if (jsonLd && Object.keys(jsonLd).length >= 2) {
-    return { ...jsonLd, url };
-  }
-
   const ogData = extractOpenGraph($);
   const domData = extractFromDom($);
 
-  return { ...domData, ...ogData, ...jsonLd, url };
+  const merged: ScrapedJob = { ...domData, ...ogData, ...jsonLd, url };
+
+  // If data is insufficient and AI fallback is enabled, use Claude to extract
+  if (useAiFallback && isInsufficient(merged)) {
+    const pageText = extractPageText(cheerio.load(html));
+    const aiData = await aiExtract(pageText, merged);
+    // Merge: AI fills gaps, but keep existing good data
+    return {
+      jobTitle: merged.jobTitle || aiData.jobTitle,
+      company: merged.company || aiData.company,
+      location: merged.location || aiData.location,
+      description: aiData.description || merged.description,
+      salaryMin: merged.salaryMin ?? aiData.salaryMin,
+      salaryMax: merged.salaryMax ?? aiData.salaryMax,
+      salaryCurrency: merged.salaryCurrency || aiData.salaryCurrency,
+      url,
+    };
+  }
+
+  return merged;
 }
 
 function extractJsonLd($: cheerio.CheerioAPI): ScrapedJob | null {

@@ -83,5 +83,56 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ApplicationInput = z.infer<typeof applicationSchema>;
 export type ApplicationUpdateInput = z.infer<typeof applicationUpdateSchema>;
+export const contactUpdateSchema = contactSchema.partial();
+
+export const reminderCreateSchema = z.object({
+  remindAt: z.string(),
+  message: z.string().optional(),
+});
+
+export const reminderUpdateSchema = reminderCreateSchema.partial();
+
+export const profileUpdateSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").optional(),
+});
+
+export const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(8, "Password must be at least 8 characters"),
+  newPassword: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+export const resumeSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  contentJson: z.record(z.string(), z.unknown()),
+  templateId: z.string().optional().nullable(),
+});
+
+export const resumeUpdateSchema = resumeSchema.partial();
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 export type ContactInput = z.infer<typeof contactSchema>;
+export type ContactUpdateInput = z.infer<typeof contactUpdateSchema>;
 export type ReminderInput = z.infer<typeof reminderSchema>;
+export type ReminderCreateInput = z.infer<typeof reminderCreateSchema>;
+export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
+export type PasswordChangeInput = z.infer<typeof passwordChangeSchema>;
+export type ResumeInput = z.infer<typeof resumeSchema>;
+export type ResumeUpdateInput = z.infer<typeof resumeUpdateSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
