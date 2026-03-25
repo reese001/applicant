@@ -87,7 +87,7 @@ export default function LandingPage() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/nyc-hero.mp4" type="video/mp4" />
+          <source src="/night-traffic.mp4" type="video/mp4" />
         </video>
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/40" />
